@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <title>Test 1</title>
   <script>var one = "one";</script>
+  <style>
+    body{
+      background: #fff;
+    }
+  </style>
+  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="app.css" landing>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 </head>
 <body>
   <script type="application/javascript">
@@ -15,5 +23,12 @@
   <script>//inline comment</script>
   <script>var next_statement='found'</script>
   <script src="outofline.js"></script>
+  <script src="app.js" landing defer></script>
+  <style>
+    /* css */
+    a{
+      font-size: 18px;
+    }
+  </style>
 </body>
 </html>

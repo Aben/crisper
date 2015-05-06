@@ -21,35 +21,70 @@ var args = nopt(
   {
     source: path,
     html: path,
-    js: path
+    js: path,
+    css: path,
+    deps: path,
+    all: Boolean
   },
   {
     s: ['--source'],
     h: ['--html'],
-    j: ['--js']
+    j: ['--js'],
+    c: ['--css'],
+    d: ['--deps']
   }
 );
 
-var outhtml = args.html;
-var outscript = args.js;
-var outScriptUri = path.relative(path.dirname(args.html), args.js);
+if(!args.deps) {
+  var outhtml = args.html;
+  var outscript = args.js;
+  var outScriptUri = path.relative(path.dirname(args.html), args.js);
 
-if (!outhtml) {
-  console.log('Missing output html file!');
-  process.exit(1);
-}
+  if (!outhtml) {
+    console.log('Missing output html file!');
+    process.exit(1);
+  }
 
-if (!outscript) {
-  console.log('Missing output js file!');
-  process.exit(1);
+  if (!outscript) {
+    console.log('Missing output js file!');
+    process.exit(1);
+  }
+
+  var outstyle = args.css;
+  if (outstyle) {
+    var outStyleUri = path.relative(path.dirname(args.html), args.css);
+  }
+} else {
+  var dirname = path.dirname(args.deps)
+  var basename = path.basename(args.deps)
+  var outhtml = path.join(dirname, basename + '.html');
+  var outscript = path.join(dirname, basename + '.js');
+  var outstyle = path.join(dirname, basename + '.css');
+  var outdepsjson = path.join(dirname, 'deps.json');
+  //console.log(outhtml)
+  //console.log(outscript)
+  //console.log(outstyle)
+  //console.log(outdepsjson)
 }
 
 var docText = '';
 
 function processSource() {
-  var split = crisp.split(docText, outScriptUri);
-  fs.writeFileSync(outhtml, split.html, 'utf-8');
-  fs.writeFileSync(outscript, split.js, 'utf-8');
+  if(args.deps) {
+    var split = crisp.splitDeps(docText, args.all);
+    //console.log(split);
+    fs.writeFileSync(outhtml, split.html, 'utf-8');
+    fs.writeFileSync(outscript, split.js, 'utf-8');
+    fs.writeFileSync(outstyle, split.style, 'utf-8');
+    fs.writeFileSync(outdepsjson, JSON.stringify(split.deps), 'utf-8');
+  } else {
+    var split = crisp.split(docText, outScriptUri, outStyleUri);
+    fs.writeFileSync(outhtml, split.html, 'utf-8');
+    fs.writeFileSync(outscript, split.js, 'utf-8');
+    if (outstyle) {
+      fs.writeFileSync(outstyle, split.style, 'utf-8');
+    }
+  }
 }
 
 if (args.source) {
